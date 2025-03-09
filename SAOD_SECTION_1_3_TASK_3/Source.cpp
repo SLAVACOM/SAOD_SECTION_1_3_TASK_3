@@ -54,41 +54,47 @@ void print() {
 	}
 }
 
-void push(string value, string target = "", bool afrer = true) {
+void push(string value, string target = "", bool after = true) {
 	if (isFull()) {
 		cout << "Список заполнен" << endl;
 		return;
 	}
 
-	int i =1;
+	int i = 1;
 	while (i < ARRAY_SIZE && list[i].next != -1) i++;
 
+	int pos = list[0].next;
+	int prev = 0;
+
+	while (pos != 0 && list[pos].value != target) {
+		prev = pos;
+		pos = list[pos].next;
+	}
+
+	if (pos == 0 && !isEmpty()) {
+		cout << "Элемент не найден, поэтому элемент добавлен в конец" << endl;
+		pos = prev;
+	}
+
 	if (isEmpty()) {
+		cout << "Список пустой, добавлен в начало" << endl;
 		list[i].value = value;
 		list[i].next = 0;
 		list[0].next = i;
 	}
-	else {
-		int pos = list[0].next;
-		int prev = 0;
-		while (pos != 0 && list[pos].value != target) {
-			prev = pos;
-			pos = list[pos].next;
-		}
-		if (pos == 0) {
-			cout << "Элемент не найден, поэтому элемент добавлен в конец" << endl;
-			pos = prev;
-		}
-		if (afrer) {
-			list[i].next = list[pos].next;
-			list[pos].next = i;
-		}
-		else {
-			list[i].next = pos;
-			list[prev].next = i;;
-		}
-		list[i].value = value;
+	
+	else if (after) {
+		list[i].next = list[pos].next;
+		list[pos].next = i;
 	}
+	else {
+		list[i].next = pos;
+		if (prev != 0)
+			list[prev].next = i;
+		else
+			list[0].next = i;
+	}
+	list[i].value = value;
 	arraySize++;
 	cout << "Элемент добавлен" << endl;
 }
@@ -140,7 +146,7 @@ void menu(bool& exit) {
 	cout << "3. Проверить полный ли список" << endl;
 	cout << "4. Добавить элемнт" << endl;
 	cout << "5. Удалить элемент" << endl;
-	cout << "6. найти элемент" << endl;
+	cout << "6. Найти элемент" << endl;
 	cout << "7. Очистить список" << endl;
 	cout << "0. Выход" << endl;
 	int choice = validIntegerInput("Выберите действие: ");
@@ -202,8 +208,6 @@ int main() {
 
 	initList();
 	bool exit = false;
-	while (!exit) {
-		menu(exit);
-	}
+	while (!exit) menu(exit);
 	return 0;
 }
